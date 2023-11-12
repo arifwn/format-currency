@@ -1,0 +1,11 @@
+.venv
+.vscode
+.env
+.envrc
+logs
+*.code-workspace
+*.pyc
+dist
+*.log
+*.pid
+.pytest_cache
