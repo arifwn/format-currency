@@ -41,3 +41,7 @@ formatted = format_currency(1234567.89, 'ID', use_current_locale=True) # returns
 ## License
 
 `format-currency` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+## References
+
+- https://en.wikipedia.org/wiki/Decimal_separator
