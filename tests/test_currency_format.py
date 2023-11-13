@@ -6,6 +6,8 @@ class TestCurrencyFormat(unittest.TestCase):
         from format_currency import format_currency
         self.assertEqual(format_currency(1234567.89, 'US'), '$ 1,234,567.89')
         self.assertEqual(format_currency(1234567.89, currency_code='USD'), '$ 1,234,567.89')
+        self.assertEqual(format_currency(1234567.89, 'us'), '$ 1,234,567.89')
+        self.assertEqual(format_currency(1234567.89, currency_code='usd'), '$ 1,234,567.89')
 
         import locale
         locale.setlocale(locale.LC_ALL, '')
@@ -16,6 +18,8 @@ class TestCurrencyFormat(unittest.TestCase):
         from format_currency import format_currency
         self.assertEqual(format_currency(1234567.89, 'ID'), 'Rp 1.234.567,89')
         self.assertEqual(format_currency(1234567.89, currency_code='IDR'), 'Rp 1.234.567,89')
+        self.assertEqual(format_currency(1234567.89, 'id'), 'Rp 1.234.567,89')
+        self.assertEqual(format_currency(1234567.89, currency_code='idr'), 'Rp 1.234.567,89')
 
         import locale
         locale.setlocale(locale.LC_ALL, '')

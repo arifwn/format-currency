@@ -46,7 +46,7 @@ class Country():
         data = cls.load_countries_data()
 
         for country_data in data:
-            if country_data.get('isoAlpha2', None) == country_code:
+            if country_data.get('isoAlpha2', None) == country_code.upper():
                 currency_data = country_data.get('currency', {})
 
                 country = cls(
@@ -76,7 +76,7 @@ class Country():
 
         for country_data in data:
             currency_data = country_data.get('currency')
-            if currency_data and currency_data.get('code', None) == currency_code:
+            if currency_data and currency_data.get('code', None) == currency_code.upper():
                 currency_data = country_data.get('currency', {})
 
                 country = cls(

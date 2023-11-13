@@ -16,6 +16,20 @@ class TestCountryData(unittest.TestCase):
         self.assertEqual(country.currency_thousands_separator, ',')
         self.assertEqual(country.currency_decimal_place, 2)
 
+    def test_load_country_us_lowercase(self):
+        from format_currency import Country
+        country = Country.load_country('us')
+        self.assertIsNotNone(country)
+        self.assertEqual(country.name, 'United States')
+        self.assertEqual(country.alpha2, 'US')
+        self.assertEqual(country.alpha3, 'USA')
+        self.assertEqual(country.currency_code, 'USD')
+        self.assertEqual(country.currency_name, 'Dollar')
+        self.assertEqual(country.currency_symbol, '$')
+        self.assertEqual(country.currency_decimal_separator, '.')
+        self.assertEqual(country.currency_thousands_separator, ',')
+        self.assertEqual(country.currency_decimal_place, 2)
+
     def test_load_country_us_cached(self):
         from format_currency import Country
         country = Country.load_country('US')
@@ -45,6 +59,20 @@ class TestCountryData(unittest.TestCase):
     def test_load_country_by_currency_code_usd(self):
         from format_currency import Country
         country = Country.load_country_by_currency_code('USD')
+        self.assertIsNotNone(country)
+        self.assertEqual(country.name, 'United States')
+        self.assertEqual(country.alpha2, 'US')
+        self.assertEqual(country.alpha3, 'USA')
+        self.assertEqual(country.currency_code, 'USD')
+        self.assertEqual(country.currency_name, 'Dollar')
+        self.assertEqual(country.currency_symbol, '$')
+        self.assertEqual(country.currency_decimal_separator, '.')
+        self.assertEqual(country.currency_thousands_separator, ',')
+        self.assertEqual(country.currency_decimal_place, 2)
+
+    def test_load_country_by_currency_code_usd_lowercase(self):
+        from format_currency import Country
+        country = Country.load_country_by_currency_code('usd')
         self.assertIsNotNone(country)
         self.assertEqual(country.name, 'United States')
         self.assertEqual(country.alpha2, 'US')
