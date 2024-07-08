@@ -29,8 +29,12 @@ class Country():
 
         data_json_path = os.path.join(os.path.dirname(__file__), 'data', 'countries.json')
         data = None
-        with open(data_json_path) as f:
-            data = json.load(f)
+        try:
+            with open(data_json_path) as f:
+                data = json.load(f)
+        except UnicodeDecodeError as e:
+            with open(data_json_path, encoding = 'utf-8') as f:
+                data = json.load(f)
 
         cached_countries_data = data
         return data
