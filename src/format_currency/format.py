@@ -2,7 +2,45 @@ import locale
 
 from .country import Country
 
-def format_currency(number, country_code=None, currency_code=None, currency_symbol=None, decimal_separator=None, thousands_separator=None, decimal_places=None, use_current_locale=False):
+def format_currency(number, country_code=None, currency_code=None, currency_symbol=None, decimal_separator=None, thousands_separator=None, decimal_places=None, use_current_locale=False, **kwargs):
+    """
+    Formats a given number as a currency string according to various parameters and optional locale settings.
+    
+    Parameters:
+    - number (float): The numerical value to be formatted.
+    - country_code (str, optional): The country code to determine currency formatting rules. Defaults to None.
+    - currency_code (str, optional): The currency code to determine currency formatting rules. Defaults to None.
+    - currency_symbol (str, optional): The symbol to be used for the currency. Defaults to None.
+    - decimal_separator (str, optional): The character to use as a decimal separator. Defaults to None.
+    - thousands_separator (str, optional): The character to use as a thousands separator. Defaults to None.
+    - decimal_places (int, optional): The number of decimal places to display. Defaults to None.
+    - use_current_locale (bool, optional): Whether to use the current locale settings for formatting. Defaults to False.
+    - kwargs (dict): Additional keyword arguments.
+    
+    Allowed kwargs:
+    - place_currency_symbol_at_end (bool): Whether to place the currency symbol at the end of the formatted number. Default is false.
+    
+    Returns:
+    - str: The formatted currency string.
+    
+    Raises:
+    - TypeError: If unexpected keyword arguments are provided.
+    
+    Notes:
+    - If no formatting options are provided, auto-formatting is determined based on the country or currency code.
+    - Supports special numbering systems for India and China if the country code is 'IN', 'BD', 'NP', 'PK', or 'CN' respectively.
+    """
+    allowed_kwargs = ['place_currency_symbol_at_end']
+    __unexpected_args_provided = []
+    for kwarg in kwargs:
+        if kwarg not in allowed_kwargs:
+            __unexpected_args_provided.append(kwarg)
+    if len(__unexpected_args_provided) > 0:
+        raise TypeError(f"Unexpected keyword argument(s) '{__unexpected_args_provided}'\nAllowed kwargs are {allowed_kwargs}.")
+    
+    # Get the value(s) of kwargs
+    place_currency_symbol_at_end = kwargs.get('place_currency_symbol_at_end', False)
+
     autoformat = True
     indian_numbering_system = False
     china_numbering_system = False
@@ -59,6 +97,8 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     formatted_number = formatted_number.replace('.', '_')
     formatted_number = formatted_number.replace(',', thousands_separator)
     formatted_number = formatted_number.replace('_', decimal_separator)
+    if place_currency_symbol_at_end:
+        return f'{formatted_number} {currency_symbol}'.strip()
     return f'{currency_symbol} {formatted_number}'.strip()
 
 
