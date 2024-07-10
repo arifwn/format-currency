@@ -25,6 +25,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
         - `chinese` i.e. "Chinese Number System"
         - `auto` i.e. "Auto Format" (based on the country i.e. from `country_code` or `currency_code`)
         - `none` i.e. "No Formatting" (no comma will be provided only symbol will be there)
+    - smart_number_formatting (bool): If True then converts 1123456.789 to "1.12 million"/"11.23 lakhs"/"todo chinese" depending on kwarg `number_format_system`. Precision after decimal depends on kwarg `decimal_places`. Defaults to False.
     
     Returns:
     - str: The formatted currency string.
@@ -36,7 +37,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     - If no formatting options are provided, auto-formatting is determined based on the country or currency code.
     - Supports special numbering systems for India and China if the country code is 'IN', 'BD', 'NP', 'PK', or 'CN' respectively.
     """
-    allowed_kwargs = ['place_currency_symbol_at_end', 'decimal_places', 'number_format_system']
+    allowed_kwargs = ['place_currency_symbol_at_end', 'decimal_places', 'number_format_system', 'smart_number_formatting']
     __unexpected_args_provided = []
     for kwarg in kwargs:
         if kwarg not in allowed_kwargs:
@@ -47,6 +48,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     # Get the value(s) of kwargs
     place_currency_symbol_at_end = kwargs.get('place_currency_symbol_at_end', False)
     number_format_system = kwargs.get('number_format_system', 'auto').lower() #* to accept upper-case too
+    smart_number_formatting = kwargs.get('smart_number_formatting', False)
 
     autoformat = True
     indian_numbering_system = False
@@ -97,16 +99,20 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     formatted_number = formatting.format(number)
     
     if number_format_system == 'international' or number_format_system == 'global':
-        pass
+        formatted_number = smart_format_international_numbering_system(formatted_number) if smart_number_formatting else formatted_number
     elif number_format_system == 'indian':
-        formatted_number = format_india_numbering_system(formatted_number)
+        formatted_number = format_india_numbering_system(formatted_number, smart_number_formatting)
     elif number_format_system == 'chinese':
-        formatted_number = format_china_numbering_system(formatted_number)
+        formatted_number = format_china_numbering_system(formatted_number, smart_number_formatting)
     elif number_format_system == 'auto':
         if indian_numbering_system:
-            formatted_number = format_india_numbering_system(formatted_number)
+            formatted_number = format_india_numbering_system(formatted_number, smart_number_formatting)
         elif china_numbering_system:
-            formatted_number = format_china_numbering_system(formatted_number)
+            formatted_number = format_china_numbering_system(formatted_number, smart_number_formatting)
+        elif smart_number_formatting:
+            #* smart formatting in international number system asked
+            formatted_number = smart_format_international_numbering_system(formatted_number)
+
     elif number_format_system == 'none':
         formatted_number = formatted_number.replace(',', '')
     else:
@@ -121,7 +127,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     return f'{currency_symbol} {formatted_number}'.strip()
 
 
-def format_india_numbering_system(number_str):
+def format_india_numbering_system(number_str, smart_format = False):
     is_negative = number_str.startswith('-')
 
     if is_negative:
@@ -135,10 +141,12 @@ def format_india_numbering_system(number_str):
     if is_negative:
         return '-' + result
 
+    if smart_format:
+        return smart_format_india_numbering_system(result)
     return result
 
 
-def format_china_numbering_system(number_str):
+def format_china_numbering_system(number_str, smart_format = False):
     is_negative = number_str.startswith('-')
 
     if is_negative:
@@ -152,4 +160,129 @@ def format_china_numbering_system(number_str):
     if is_negative:
         return '-' + result
 
+    if smart_format:
+        return smart_format_chinese_numbering_system(result)
     return result
+
+def smart_format_numbering_system_according_to_supplied_units(formatted_number, units_dict: dict):
+    """
+    Formats a given number string based on the supplied units dictionary.
+
+    Parameters:
+    - formatted_number (str): A number string that can contain commas and decimals.
+    - units_dict (dict): Dictionary specifying the units and their values to format the number.
+        
+        Example:
+        units_dict = {
+            'only': 1,
+            'Thousands': 1000,  # Value to multiply to jump from 'only' to 'Thousands'
+            'Million': 1000,
+            'Billion': 1000,    # Value to multiply to jump from 'Million' to 'Billion'
+        }
+
+    Returns:
+    - tuple of (str, str): The formatted number string and its appropriate unit suffix.
+
+    Notes:
+    - If the number has no commas (less than one thousand), returns the original formatted_number.
+    - The function determines the appropriate unit suffix based on the supplied units_dict and formats the number accordingly.
+    - Supports formatting for both integer and decimal numbers.
+    """
+    splitted_with_comma = formatted_number.split(',')
+    decimal_places = len(formatted_number.split('.')[1]) if '.' in formatted_number else 0
+    number_of_commas = len(splitted_with_comma) - 1
+    number = float(formatted_number.replace(',', ''))
+
+    if number_of_commas == 0:
+        return formatted_number
+
+    suffix = 'only'
+    for key, value in units_dict.items():
+        if number < value:
+            break
+        suffix = key
+        number /= value
+
+    return f"{round(number, decimal_places):,.{decimal_places}f}", suffix.capitalize()
+
+def smart_format_india_numbering_system(formatted_number) -> str:
+    """
+    Formats a given number string according to the Indian numbering system.
+
+    Parameters:
+    - formatted_number (str): A number string that can contain commas and decimals.
+
+    Returns:
+    - str: The formatted number string in the Indian numbering system.
+
+    Notes:
+    - Uses the `smart_format_numbering_system_according_to_supplied_units` function with predefined units for Indian numbering.
+    - Example:
+        >>> smart_format_india_numbering_system('12345678.90')
+        '1.23 crore'
+    """
+    formatted_number_suffix = smart_format_numbering_system_according_to_supplied_units(
+        formatted_number,
+        units_dict={
+            'only': 1,
+            'hazaar': 1000,
+            'lakhs': 100,
+            'crore': 100,
+            'sau crore': 100,
+            'hazaar crore': 10,
+            'lakh crore': 100,
+            'crore crore': 100,
+        }
+    )
+
+    if ',' not in formatted_number_suffix[0]:
+        return ' '.join(formatted_number_suffix)
+    return format_india_numbering_system(formatted_number_suffix[0]) + ' ' + formatted_number_suffix[1]
+
+def smart_format_international_numbering_system(formatted_number) -> str:
+    """
+    Formats a given number string according to the international numbering system.
+
+    Parameters:
+    - formatted_number (str): A number string that can contain commas and decimals.
+
+    Returns:
+    - str: The formatted number string in the international numbering system.
+
+    Notes:
+    - Uses the `smart_format_numbering_system_according_to_supplied_units` function with predefined units for international numbering.
+    - Example:
+        >>> smart_format_international_numbering_system('12345678.90')
+        '12.35 million'
+    """
+    return ' '.join(smart_format_numbering_system_according_to_supplied_units(
+        formatted_number,
+        units_dict = {
+            'only': 1,
+            'Thousands': 1000,
+            'Million': 1000,
+            'Billion': 1000,
+            'Trillion': 1000,
+            'Quadrillion': 1000,
+            'Quintillion': 1000,
+        })
+    )
+
+def smart_format_chinese_numbering_system(formatted_number) -> str:
+    """
+    Formats a given number string according to the Chinese numbering system.
+
+    Parameters:
+    - formatted_number (str): A number string that can contain commas and decimals.
+
+    Returns:
+    - str: The formatted number string in the Chinese numbering system.
+
+    Notes:
+    - Placeholder function. To be implemented.
+    - Throws a warning that Chinese numbering system formatting is not yet implemented.
+    """
+    import warnings
+    warnings.warn("Chinese numbering system formatting is not yet implemented", FutureWarning)
+    return "todo"
+
