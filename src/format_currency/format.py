@@ -19,6 +19,12 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     Allowed kwargs:
     - place_currency_symbol_at_end (bool): Whether to place the currency symbol at the end of the formatted number. Default is false.
     - decimal_places (int): The number of decimal places to display. Uses decimal places according to country if no provided, and defaults to 2 if country_code or currency_code not provided.
+    - number_format_system (str): Number format system you want to use. Defaults to `auto`. Supported number format systems are 
+        - `global` or `international` i.e. "International Number System"
+        - `indian` i.e. "Indian Number System"
+        - `chinese` i.e. "Chinese Number System"
+        - `auto` i.e. "Auto Format" (based on the country i.e. from `country_code` or `currency_code`)
+        - `none` i.e. "No Formatting" (no comma will be provided only symbol will be there)
     
     Returns:
     - str: The formatted currency string.
@@ -30,7 +36,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     - If no formatting options are provided, auto-formatting is determined based on the country or currency code.
     - Supports special numbering systems for India and China if the country code is 'IN', 'BD', 'NP', 'PK', or 'CN' respectively.
     """
-    allowed_kwargs = ['place_currency_symbol_at_end', 'decimal_places']
+    allowed_kwargs = ['place_currency_symbol_at_end', 'decimal_places', 'number_format_system']
     __unexpected_args_provided = []
     for kwarg in kwargs:
         if kwarg not in allowed_kwargs:
@@ -40,6 +46,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     
     # Get the value(s) of kwargs
     place_currency_symbol_at_end = kwargs.get('place_currency_symbol_at_end', False)
+    number_format_system = kwargs.get('number_format_system', 'auto').lower() #* to accept upper-case too
 
     autoformat = True
     indian_numbering_system = False
@@ -88,11 +95,23 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
 
     # return formatting
     formatted_number = formatting.format(number)
-
-    if (not use_current_locale) and indian_numbering_system:
+    
+    if number_format_system == 'international' or number_format_system == 'global':
+        pass
+    elif number_format_system == 'indian':
         formatted_number = format_india_numbering_system(formatted_number)
-    if (not use_current_locale) and china_numbering_system:
+    elif number_format_system == 'chinese':
         formatted_number = format_china_numbering_system(formatted_number)
+    elif number_format_system == 'auto':
+        if indian_numbering_system:
+            formatted_number = format_india_numbering_system(formatted_number)
+        elif china_numbering_system:
+            formatted_number = format_china_numbering_system(formatted_number)
+    elif number_format_system == 'none':
+        formatted_number = formatted_number.replace(',', '')
+    else:
+        raise ValueError(f"Invalid number_format_system '{number_format_system}'. Supported values are 'international', 'indian', 'chinese', 'auto', 'none'.")
+
 
     formatted_number = formatted_number.replace('.', '_')
     formatted_number = formatted_number.replace(',', thousands_separator)
