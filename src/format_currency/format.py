@@ -25,7 +25,7 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
         - `chinese` i.e. "Chinese Number System"
         - `auto` i.e. "Auto Format" (based on the country i.e. from `country_code` or `currency_code`)
         - `none` i.e. "No Formatting" (no comma will be provided only symbol will be there)
-    - smart_number_formatting (bool): If True then converts 1123456.789 to "1.12 million"/"11.23 lakhs"/"todo chinese" depending on kwarg `number_format_system`. Precision after decimal depends on kwarg `decimal_places`. Defaults to False.
+    - smart_number_formatting (bool): If True then converts 1123456.789 to "1.12 million"/"11.23 lakhs"/"1.12 百万" depending on kwarg `number_format_system`. Precision after decimal depends on kwarg `decimal_places`. Defaults to False.
     
     Returns:
     - str: The formatted currency string.
@@ -283,10 +283,26 @@ def smart_format_chinese_numbering_system(formatted_number) -> str:
     - str: The formatted number string in the Chinese numbering system.
 
     Notes:
-    - Placeholder function. To be implemented.
-    - Throws a warning that Chinese numbering system formatting is not yet implemented.
+    - Uses the `smart_format_numbering_system_according_to_supplied_units` function with predefined units for Chinese numbering.
+    - Example:
+        >>> smart_format_chinese_numbering_system('12345678.90')
+        '1.23 千万'
     """
-    import warnings
-    warnings.warn("Chinese numbering system formatting is not yet implemented", FutureWarning)
-    return "todo"
+    smartly_formatted_number = smart_format_numbering_system_according_to_supplied_units(
+        formatted_number,
+        units_dict = {
+            'only': 1,
+            '百': 100,
+            '千': 10,
+            '万': 10,
+            '百万': 100,
+            '千万': 10,
+            '亿': 10,
+            '万亿': 10,
+            '千万亿': 1000,
+            }
+        )
 
+    if ',' not in formatted_number:
+        return ''.join(smartly_formatted_number)
+    return format_china_numbering_system(smartly_formatted_number[0]) + ' ' + smartly_formatted_number[1]
