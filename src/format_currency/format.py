@@ -221,7 +221,7 @@ def smart_format_india_numbering_system(formatted_number) -> str:
         >>> smart_format_india_numbering_system('12345678.90')
         '1.23 crore'
     """
-    formatted_number_suffix = smart_format_numbering_system_according_to_supplied_units(
+    smartly_formatted_number = smart_format_numbering_system_according_to_supplied_units(
         formatted_number,
         units_dict={
             'only': 1,
@@ -235,9 +235,9 @@ def smart_format_india_numbering_system(formatted_number) -> str:
         }
     )
 
-    if ',' not in formatted_number_suffix[0]:
-        return ' '.join(formatted_number_suffix)
-    return format_india_numbering_system(formatted_number_suffix[0]) + ' ' + formatted_number_suffix[1]
+    if ',' not in smartly_formatted_number[0]:
+        return ' '.join(smartly_formatted_number)
+    return format_india_numbering_system(smartly_formatted_number[0]) + ' ' + smartly_formatted_number[1]
 
 def smart_format_international_numbering_system(formatted_number) -> str:
     """
