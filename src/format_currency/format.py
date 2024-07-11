@@ -235,8 +235,8 @@ def smart_format_india_numbering_system(formatted_number) -> str:
         }
     )
 
-    if ',' not in smartly_formatted_number[0]:
-        return ' '.join(smartly_formatted_number)
+    if ',' not in formatted_number:
+        return ''.join(smartly_formatted_number)
     return format_india_numbering_system(smartly_formatted_number[0]) + ' ' + smartly_formatted_number[1]
 
 def smart_format_international_numbering_system(formatted_number) -> str:
@@ -255,7 +255,7 @@ def smart_format_international_numbering_system(formatted_number) -> str:
         >>> smart_format_international_numbering_system('12345678.90')
         '12.35 million'
     """
-    return ' '.join(smart_format_numbering_system_according_to_supplied_units(
+    smartly_formatted_number = smart_format_numbering_system_according_to_supplied_units(
         formatted_number,
         units_dict = {
             'only': 1,
@@ -265,8 +265,12 @@ def smart_format_international_numbering_system(formatted_number) -> str:
             'Trillion': 1000,
             'Quadrillion': 1000,
             'Quintillion': 1000,
-        })
+        }
     )
+
+    if ',' not in formatted_number:
+        return ''.join(smartly_formatted_number)
+    return ' '.join(smartly_formatted_number)
 
 def smart_format_chinese_numbering_system(formatted_number) -> str:
     """
