@@ -292,14 +292,10 @@ def smart_format_chinese_numbering_system(formatted_number) -> str:
         formatted_number,
         units_dict = {
             'only': 1,
-            '百': 100,
-            '千': 10,
-            '万': 10,
-            '百万': 100,
-            '千万': 10,
-            '亿': 10,
+            '万': 10000,
+            '亿': 10000,
+            '千亿': 1000,
             '万亿': 10,
-            '千万亿': 1000,
             }
         )
 
