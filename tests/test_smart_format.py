@@ -8,7 +8,19 @@ class TestCurrencyFormatAdvanced(unittest.TestCase):
         # Test smart formatting for different number systems
         self.assertEqual(format_currency(1234567.89, currency_code='USD', number_format_system='global', smart_number_formatting=True), '$ 1.23 Million')
         self.assertEqual(format_currency(12345678.9, currency_code='INR', number_format_system='indian', smart_number_formatting=True), '₹ 1.23 Crore')
-        self.assertEqual(format_currency(1234567890.12, currency_code='CNY', number_format_system='chinese', smart_number_formatting=True), '¥ 1.23 万亿')
+
+        __values = [1.68, 97.67, 999.89, 7178.41, 89686.03, 307662.72, 8579432.88, 70457100.06, 986256196.44, 1044444788.31, 64846241676, 535875416792.75, 9500254573835.82]
+        __correct_values = ['¥ 1.68', '¥ 97.67', '¥ 999.89', '¥ 7178.41', '¥ 8.97 万', '¥ 30.77 万', '¥ 857.94 万', '¥ 7045.71 万', '¥ 9.86 亿', '¥ 10.44 亿', '¥ 648.46 亿', '¥ 5.36 千亿', '¥ 9.50 万亿']
+
+        for __value, __correct_value in zip(__values, __correct_values):
+            self.assertEqual(
+                format_currency(
+                    __value,
+                    currency_code='CNY',
+                    number_format_system='chinese',
+                    smart_number_formatting=True),
+                    __correct_value
+                    )
 
     def test_symbol_at_end(self):
         from format_currency import format_currency
@@ -40,7 +52,7 @@ class TestCurrencyFormatAdvanced(unittest.TestCase):
         # Test combination of smart formatting and placing symbol at end
         self.assertEqual(format_currency(1234567.89, currency_code='USD', smart_number_formatting=True, place_currency_symbol_at_end=True), '1.23 Million $')
         self.assertEqual(format_currency(12345678.9, currency_code='INR', number_format_system='indian', smart_number_formatting=True, place_currency_symbol_at_end=True), '1.23 Crore ₹')
-        self.assertEqual(format_currency(1234567890.12, currency_code='CNY', number_format_system='chinese', smart_number_formatting=True, place_currency_symbol_at_end=True), '1.23 万亿 ¥')
+        self.assertEqual(format_currency(1234567890.12, currency_code='CNY', number_format_system='chinese', smart_number_formatting=True, place_currency_symbol_at_end=True), '12.35 亿 ¥')
 
         # Test combination of decimal places and different number format systems
         self.assertEqual(format_currency(1234567.89123, currency_code='USD', decimal_places=3, number_format_system='global'), '$ 1,234,567.891')
