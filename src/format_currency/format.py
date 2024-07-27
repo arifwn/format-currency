@@ -98,26 +98,27 @@ def format_currency(number, country_code=None, currency_code=None, currency_symb
     # return formatting
     formatted_number = formatting.format(number)
     
-    if not use_current_locale:
-        if number_format_system == 'international' or number_format_system == 'global':
-            formatted_number = smart_format_international_numbering_system(formatted_number) if smart_number_formatting else formatted_number
-        elif number_format_system == 'indian':
-            formatted_number = format_india_numbering_system(formatted_number, smart_number_formatting)
-        elif number_format_system == 'chinese':
-            formatted_number = format_china_numbering_system(formatted_number, smart_number_formatting)
-        elif number_format_system == 'auto':
-            if indian_numbering_system:
+    if number_format_system == 'international' or number_format_system == 'global':
+        formatted_number = smart_format_international_numbering_system(formatted_number) if smart_number_formatting else formatted_number
+    elif number_format_system == 'indian':
+        formatted_number = format_india_numbering_system(formatted_number, smart_number_formatting)
+    elif number_format_system == 'chinese':
+        formatted_number = format_china_numbering_system(formatted_number, smart_number_formatting)
+    elif number_format_system == 'auto':
+        if indian_numbering_system:
+            if not use_current_locale:
                 formatted_number = format_india_numbering_system(formatted_number, smart_number_formatting)
-            elif china_numbering_system:
+        elif china_numbering_system:
+            if not use_current_locale:
                 formatted_number = format_china_numbering_system(formatted_number, smart_number_formatting)
-            elif smart_number_formatting:
-                #* smart formatting in international number system asked
-                formatted_number = smart_format_international_numbering_system(formatted_number)
+        elif smart_number_formatting:
+            #* smart formatting in international number system asked
+            formatted_number = smart_format_international_numbering_system(formatted_number)
 
-        elif number_format_system == 'none':
-            formatted_number = formatted_number.replace(',', '')
-        else:
-            raise ValueError(f"Invalid number_format_system '{number_format_system}'. Supported values are 'international', 'indian', 'chinese', 'auto', 'none'.")
+    elif number_format_system == 'none':
+        formatted_number = formatted_number.replace(',', '')
+    else:
+        raise ValueError(f"Invalid number_format_system '{number_format_system}'. Supported values are 'international', 'indian', 'chinese', 'auto', 'none'.")
 
     formatted_number = formatted_number.replace('.', '_')
     formatted_number = formatted_number.replace(',', thousands_separator)
