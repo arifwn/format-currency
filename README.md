@@ -24,10 +24,12 @@ from format_currency import format_currency
 formatted = format_currency(1234567.89, 'US') # returns $ 1,234,567.89
 formatted = format_currency(1234567.89, 'ID') # returns Rp 1.234.567,89
 
-#format currency by currency code
+# format currency by currency code
 formatted = format_currency(1234567.89, currency_code='USD') # returns $ 1,234,567.89
 formatted = format_currency(1234567.89, currency_code='IDR') # returns Rp 1.234.567,89
 
+# smart formatting
+formatted = format_currency(value, country_code='CN', smart_number_formatting=True) # returns ¥ 123.46 万
 
 # format currency by country code, respecting global locale settings
 import locale
