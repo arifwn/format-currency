@@ -12,6 +12,7 @@ A no-frills currency formatting library that allows you to format numbers as cur
     - [Advance](#advanced-usage)
     - [Parameters](#parameters)
 - [Testing](#testing)
+- [Applications](#applications)
 - [License](#license)
 - [References](#references)
 
@@ -95,6 +96,12 @@ Run the test runner:
 ```bash
 ./test_runner.sh
 ```
+
+## Applications
+
+This library can be used in various applications that prioritise robust customisability and locale-aware currency formatting etc. For example:
+
+[Currency Converter](https://github.com/AmanRathoreP/Currency-Converter): A comprehensive currency conversion application that supports multiple currencies, auto-updating rates, and a modern UI, cross platform compatibility etc.
 
 ## License
 
